@@ -14,14 +14,12 @@ pointsFor move
     | move == "A" = 1
     | move == "B" = 2
     | move == "C" = 3
-    | otherwise = error "bad input"
 
 translate move
     | move == "X" = "A"
     | move == "Y" = "B"
     | move == "Z" = "C"
-    | otherwise = error "bad input"
-
+    
 wins x y 
     | x == "A" && y == "B" = y
     | x == "B" && y == "C" = y

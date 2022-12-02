@@ -14,7 +14,6 @@ pointsFor move
     | move == "A" = 1
     | move == "B" = 2
     | move == "C" = 3
-    | otherwise = error "bad input"
 
 -- [winning move, losing move, draw]
 getDecidingMoves opponentMove
@@ -26,7 +25,6 @@ translate outcome opponentMove
     | outcome == "X" = (getDecidingMoves opponentMove) !! 1
     | outcome == "Y" = (getDecidingMoves opponentMove) !! 2
     | outcome == "Z" = (getDecidingMoves opponentMove) !! 0
-    | otherwise = error "bad input"
 
 wins x y 
     | x == "A" && y == "B" = y
