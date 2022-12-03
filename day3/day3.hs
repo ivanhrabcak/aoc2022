@@ -17,8 +17,13 @@ charValue c = ord c - ord x + remainder
 
 getCommonItemPriority :: String -> String -> Int
 getCommonItemPriority (x:xs) comp1
-    | xs == [] = if isInfixOf [x] comp1 then charValue x else 0
-    | otherwise = if isInfixOf [x] comp1 then charValue x else getCommonItemPriority xs comp1
+    | xs == [] && isCommonChar = priority
+    | isCommonChar = priority
+    | xs /= [] = getCommonItemPriority xs comp1
+    | otherwise = 0
+    where 
+        isCommonChar = isInfixOf [x] comp1
+        priority = charValue x
 
 part1 (x:xs)
     | xs == [] = getCommonItemPriority comp1 comp2
@@ -29,14 +34,21 @@ part1 (x:xs)
         comp2 = drop half x
 
 getCommonItemsTriplet (x:xs) r1 r2
-    | xs == [] = if isInfixOf [x] r1 && isInfixOf [x] r2 then charValue x else 0
-    | otherwise = if isInfixOf [x] r1 && isInfixOf [x] r2 then charValue x else getCommonItemsTriplet xs r1 r2
+    | xs == [] && isInBothStrings = priority
+    | isInBothStrings = priority
+    | xs /= [] = getCommonItemsTriplet xs r1 r2
+    | otherwise = 0
+    where 
+        isInBothStrings = isInfixOf [x] r1 && isInfixOf [x] r2
+        priority = charValue x
 
 part2 :: [String] -> Int
 part2 (x:xs)
-    | next == [] = getCommonItemsTriplet x r2 r3
-    | otherwise =  getCommonItemsTriplet x r2 r3 + part2 next
+    | next == [] = commonItems
+    | otherwise =  commonItems + part2 next
     where
         r2 = head xs
         r3 = head (drop 1 xs)
         next = drop 2 xs
+
+        commonItems = getCommonItemsTriplet x r2 r3
