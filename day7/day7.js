@@ -6,51 +6,34 @@ const commands = fs.readFileSync('input.txt').toString()
     .map(x => x.trim().split('\n'));
 
 const fileSize = (state, path) => {
-    let currentFolder = state.filesystem;
-    if (path.length >= 1) {
-        for (let pathPart of path.slice(0, path.length - 1)) {
-            currentFolder = currentFolder[pathPart];
-        }
-    }
+    const lastElement = path.length - 1;
+    let currentFolder = path.slice(0, lastElement).reduce((acc, x) => acc[x], state.filesystem);
 
-    const fileOrDirectory = currentFolder[path[path.length - 1]];
+    const fileOrDirectory = currentFolder[path[lastElement]];
     if (typeof fileOrDirectory == 'number') {
         return fileOrDirectory;
     }
 
-    let size = 0;
-    for (let file of Object.keys(fileOrDirectory)) {
-        size += fileSize(state, [...path, file])
-    }
-
-    return size;
+    return Object.keys(fileOrDirectory).reduce((acc, x) => acc + fileSize(state, [...path, x]), 0);
 }
 
-const createDirectory = (state, dirname) => {
-    let currentFolder = state.filesystem;
-    for (let pathPart of state.currentDirectory) {
-        currentFolder = currentFolder[pathPart];
-    }
+const getCurrentDirectory = (state) => state.currentDirectory.reduce((acc, x) => acc[x], state.filesystem);
 
-    currentFolder[dirname] = {};
+const createDirectory = (state, dirname) => {
+    getCurrentDirectory(state)[dirname] = {};
 }
 
 const createFile = (state, filename, size) => {
-    let currentFolder = state.filesystem;
-    for (let pathPart of state.currentDirectory) {
-        currentFolder = currentFolder[pathPart];;
-    }
-
-    currentFolder[filename] = parseInt(size);
+    getCurrentDirectory(state)[filename] = parseInt(size);
 }
 
 const state = {filesystem: {'/': {}}, currentDirectory: []};
-for (let terminalCommand of commands) {
-    output = terminalCommand.slice(1);
+commands.forEach((terminalCommand) => {
+    const commandOutput = terminalCommand.slice(1);
     const [command, ...commandArgs] = terminalCommand[0].split(' ');
     
     if (command === 'ls') {
-        output.forEach(x => {
+        commandOutput.forEach(x => {
             const [sizeOrDir, ...filename] = x.split(' ');
             if (sizeOrDir === 'dir') {
                 createDirectory(state, filename[0]);
@@ -66,7 +49,7 @@ for (let terminalCommand of commands) {
         }
     }
 
-}
+});
 
 const getAllDirectorySizes = (directory, path) => {
     let currentDirectory = directory;
@@ -88,21 +71,14 @@ const getAllDirectorySizes = (directory, path) => {
 const allDirs = getAllDirectorySizes(state.filesystem, []);
 
 const part1 = () => {
-    let sum = 0
-    for (let dir of allDirs) {
-        if (dir.size <= 100_000) {
-            sum += dir.size;
-        }
-    }
-
-    console.log(sum);
+    console.log(
+        allDirs.reduce((acc, x) => x.size <= 100_000 ? acc + x.size : acc, 0)
+    );
 }
 
 const part2 = () => {
     const total = 70000000;
     const required = 30000000;
-
-    
     const free = total - allDirs[0].size;
 
     console.log(
